@@ -38,31 +38,31 @@ public class AccountTests
     }
 
     [Fact]
-    public void When_BalanceIncreasingEvent_ShouldIncreaseBalance()
+    public void When_BalanceIncreased_ShouldIncreaseBalance()
     {
         var account = AggregateFactory<Account>.Create(AccountId);
         var accountCreatedEvent = new AccountCreated(_initialBalance.Value, AccountId.Id);
-        var balanceIncreasingEvent = new BalanceIncreasingEvent(50, AccountId.Id);
+        var balanceIncreased = new BalanceIncreased(50, AccountId.Id);
 
-        account.LoadFromHistory(new List<IEvent> { accountCreatedEvent, balanceIncreasingEvent });
+        account.LoadFromHistory(new List<IEvent> { accountCreatedEvent, balanceIncreased });
 
         account.Balance.Value.Should().Be(150); // 100 (initial) + 50 (increase)
     }
 
     [Fact]
-    public void When_BalanceDecreasingEvent_ShouldDecreaseBalance()
+    public void When_BalanceDecreased_ShouldDecreaseBalance()
     {
         var account = AggregateFactory<Account>.Create(AccountId);
         var accountCreatedEvent = new AccountCreated(_initialBalance.Value, AccountId.Id);
-        var balanceDecreasingEvent = new BalanceDecreasingEvent(-30, AccountId.Id);
+        var balanceDecreased = new BalanceDecreased(-30, AccountId.Id);
 
-        account.LoadFromHistory(new List<IEvent> { accountCreatedEvent, balanceDecreasingEvent });
+        account.LoadFromHistory(new List<IEvent> { accountCreatedEvent, balanceDecreased });
 
         account.Balance.Value.Should().Be(70); // 100 (initial) - 30 (decrease)
     }
 
     [Fact]
-    public void Deposit_PositiveAmount_ShouldRaiseBalanceIncreasingEvent()
+    public void Deposit_PositiveAmount_ShouldRaiseBalanceIncreased()
     {
         var account = AggregateFactory<Account>.Create(AccountId);
         var accountCreatedEvent = new AccountCreated(_initialBalance.Value, AccountId.Id);
@@ -73,12 +73,12 @@ public class AccountTests
         
         var uncommittedEvents = account.GetUncommittedEvents();
         uncommittedEvents.Should().ContainSingle()
-            .Which.Should().BeOfType<BalanceIncreasingEvent>()
+            .Which.Should().BeOfType<BalanceIncreased>()
             .Which.Amount.Should().Be(depositAmount.Value);
     }
 
     [Fact]
-    public void Deposit_NegativeAmount_ShouldRaiseBalanceDecreasingEvent()
+    public void Deposit_NegativeAmount_ShouldRaiseBalanceDecreased()
     {
         var account = AggregateFactory<Account>.Create(AccountId);
         var accountCreatedEvent = new AccountCreated(_initialBalance.Value, AccountId.Id);
@@ -89,7 +89,7 @@ public class AccountTests
 
         var uncommittedEvents = account.GetUncommittedEvents();
         uncommittedEvents.Should().ContainSingle()
-            .Which.Should().BeOfType<BalanceDecreasingEvent>()
+            .Which.Should().BeOfType<BalanceDecreased>()
             .Which.Amount.Should().Be(withdrawalAmount.Value);
     }
 
