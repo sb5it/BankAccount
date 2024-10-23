@@ -18,9 +18,9 @@ public class Account : AggregateRoot
         if(Balance.Value + amount.Value < 0)
             throw new InvalidOperationException("Insufficient funds");
         if(amount.Value > 0)
-            RaiseDomainEvent(new BalanceIncreasingEvent(amount.Value, Id.Id));
+            RaiseDomainEvent(new BalanceIncreased(amount.Value, Id.Id));
         else
-            RaiseDomainEvent(new BalanceDecreasingEvent(amount.Value, Id.Id));
+            RaiseDomainEvent(new BalanceDecreased(amount.Value, Id.Id));
     }
     
     private void When(AccountCreated e)
@@ -28,12 +28,12 @@ public class Account : AggregateRoot
         Balance = new Amount(e.Amount);
     }
     
-    private void When(BalanceIncreasingEvent e)
+    private void When(BalanceIncreased e)
     {
         Balance = Balance.Add(new Amount(e.Amount));
     }
     
-    private void When(BalanceDecreasingEvent e)
+    private void When(BalanceDecreased e)
     {
         Balance = Balance.Add(new Amount(e.Amount));
     }
